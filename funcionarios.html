@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro funcionário</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,500;1,14..32,500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <h3 id="titulo">Registro de funcionários</h3>
+    <div class="container">
+        <input type="text" id="nomeInput" placeholder="Digite o nome do funcionário">
+        <input type="text" id="cargoInput" placeholder="Digite o cargo do funcionário">
+        <input type="number" id="salarioInput" placeholder="Digite o salário do funcionário">
+        <button onclick="registrar()">Registrar Funcionário</button>
+        <p id="registro"></p>
+    </div>
+
+    <h3 id ="titulo">Atualizar salário de funcionário</h3>
+    <div class="container">
+        <input type="text" id="nomeSalarioInput" placeholder="Digite o nome do funcionário">
+        <button onclick="buscar()">Buscar</button>
+        <p id="mostrarDadosFuncionário"></p>
+        <input type="number" id="novoSalarioInput" placeholder="Digite o aumento em porcentagem">
+        <button onclick="atualizarSalario()">Atualizar</button>
+        <p id="salarioAtualizado"></p>
+    </div>
+
+    <h3 id = "titulo">Média dos salários</h3>
+    <div class="container">
+        <button onclick="media()">Exibir Média</button>
+        <p id="mediaSalarios"></p>
+    </div>
+
+    <script>
+        class funcionario {
+            constructor(nome, cargo, salario){
+                this.nome = nome;
+                this.cargo = cargo;
+                this.salario = salario;
+            }
+
+            aumentarSalario(porcentagem) {
+                this.salario += this.salario * (porcentagem/100);
+            }
+
+            static calcularMedia(array) {
+                if(array.length === 0) return 0;
+                let soma = 0;
+                for(let i = 0; i < array.length; i++){
+                    soma += array[i].salario;
+                }
+                return soma / array.length;
+            }
+        }
+
+        let funcionarios = [];
+
+        function registrar() {
+            let nome = document.getElementById("nomeInput").value.trim();
+            let cargo = document.getElementById("cargoInput").value.trim();
+            let salario = parseFloat(document.getElementById("salarioInput").value);
+
+            if(!nome || !cargo || isNaN(salario) || salario <= 0){
+                document.getElementById("registro").innerHTML = "Preencha todos os campos corretamente!";
+                return;
+            }
+
+            let funcionarioo = new funcionario(nome, cargo, salario);
+            funcionarios.push(funcionarioo);
+
+            document.getElementById("registro").innerHTML = `Funcionário ${funcionarioo.nome} registrado!`;
+            document.getElementById("nomeInput").value = "";
+            document.getElementById("cargoInput").value = "";
+            document.getElementById("salarioInput").value = "";
+        }
+
+        function buscar() {
+            let nomeBusca = document.getElementById("nomeSalarioInput").value.trim();
+            let encontrado = funcionarios.find(f => f.nome === nomeBusca);
+
+            if(encontrado){
+                document.getElementById("mostrarDadosFuncionário").innerHTML = 
+                `Nome: ${encontrado.nome}<br>
+                Cargo: ${encontrado.cargo}<br>
+                Salário atual: R$ ${encontrado.salario.toFixed(2)}`;
+            } else {
+                document.getElementById("mostrarDadosFuncionário").innerHTML = "Funcionário não encontrado.";
+            }
+        }
+
+        function atualizarSalario() {
+            let nomeBusca = document.getElementById("nomeSalarioInput").value.trim();
+            let novoSalario = parseFloat(document.getElementById("novoSalarioInput").value);
+
+            let encontrado = funcionarios.find(f => f.nome === nomeBusca);
+
+            if(encontrado && !isNaN(novoSalario) && novoSalario > 0){
+                encontrado.aumentarSalario(novoSalario);
+                document.getElementById("salarioAtualizado").innerHTML =
+                    `Novo salário de ${encontrado.nome}: R$ ${encontrado.salario.toFixed(2)}`;
+                buscar();
+                document.getElementById("novoSalarioInput").value = "";
+            } else if(!encontrado) {
+                document.getElementById("salarioAtualizado").innerHTML = "Funcionário não encontrado.";
+            } else {
+                document.getElementById("salarioAtualizado").innerHTML = "Digite um valor válido para o aumento.";
+            }
+        }
+
+        function media() {
+            let media = funcionario.calcularMedia(funcionarios);
+            document.getElementById("mediaSalarios").innerHTML =  `Média dos salários: R$ ${media.toFixed(2)}`;
+        }
+    </script>
+</body>
+</html>
